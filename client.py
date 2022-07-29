@@ -23,36 +23,38 @@ def halt():
         if tmp=='EOL':
             wait=0
         if wait:
-            time.sleep(1/60)
             print(tmp)
 server.sendto(bytes('motd','utf-8'),(ip,7000))
 wait=0
 tmp=server.recvfrom(4096)[0]
-server.settimeout(5)
+server.settimeout(30)
+psd='No Name'
 if tmp.decode('utf-8')=='SOL':
     wait=1
     halt()
         
 while True:
-    server.sendto(bytes('whoami','utf-8'),(ip,7000))
-    wait=0
-    tmp=server.recvfrom(4096)[0]
-    if tmp.decode('utf-8')=='SOL':
-        wait=1
-    while wait:
+    try:
+        server.sendto(bytes('whoami','utf-8'),(ip,7000))
+        wait=0
         tmp=server.recvfrom(4096)[0]
-        tmp=tmp.decode('utf-8')
-        if tmp=='EOL':
-            wait=0
-        if wait:
-            username=tmp
-    tmp=''
-    cmd=str(input(str(username)+' ('+str(byte)+') > '))
-    server.sendto(bytes(cmd,'utf-8'),(ip,7000))
-    wait=0
-    tmp=server.recvfrom(4096)[0]
-#    print('['+str(tmp)+']')
-    if tmp.decode('utf-8')=='SOL':
-        wait=1
-        halt()
-    
+        if tmp.decode('utf-8')=='SOL':
+            wait=1
+        while wait:
+            tmp=server.recvfrom(4096)[0]
+            tmp=tmp.decode('utf-8')
+            if tmp=='EOL':
+                wait=0
+            if wait:
+                psd=tmp
+        tmp=''
+        cmd=str(input(str(psd)+' $'))
+        server.sendto(bytes(cmd,'utf-8'),(ip,7000))
+        wait=0
+        tmp=server.recvfrom(4096)[0]
+#        print('['+str(tmp)+']')
+        if tmp.decode('utf-8')=='SOL':
+            wait=1
+            halt()
+    except Exception:
+        continue    
